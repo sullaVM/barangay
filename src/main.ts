@@ -1,11 +1,12 @@
 import { config } from 'dotenv';
-
-import { initServer } from './server/server';
+import * as initServer from './server/server'; // eslint-disable-line
+import { initFirebase } from './firebase/firebase';
 
 const bootstrap = (): void => {
   config();
 
-  const server = initServer();
+  initFirebase();
+  const server = initServer.default();
   const { PORT } = process.env;
   server.listen(PORT, () => console.log(`Listening on port ${PORT}`));
 };
