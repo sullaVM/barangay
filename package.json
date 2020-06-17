@@ -6,7 +6,7 @@
     "build": "rimraf dist && tsc -p tsconfig.build.json",
     "start": "ts-node -r tsconfig-paths/register src/main.ts",
     "prestart:prod": "rimraf dist && yarn run build",
-    "start:prod": "node dist/main.js",
+    "start:prod": "ENV=production node dist/main.js",
     "lint": "eslint . --ext .ts,.js",
     "lint:fix": "eslint . --ext .ts,.js --fix"
   },
