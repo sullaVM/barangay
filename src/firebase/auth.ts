@@ -1,17 +1,4 @@
-import * as sa from 'credentials.json';
-import {
-  ServiceAccount,
-  auth,
-  credential,
-  initializeApp,
-} from 'firebase-admin';
-
-export const initFirebase = (): void => {
-  initializeApp({
-    credential: credential.cert(sa as ServiceAccount),
-    databaseURL: process.env.DB_URL,
-  });
-};
+import { auth } from 'firebase-admin';
 
 export const createNewCookie = async (token: string, expiresIn: number):
 Promise<string | null> => {
