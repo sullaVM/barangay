@@ -9,7 +9,7 @@ export const hello = (_req: Request, res: Response): void => {
 };
 
 export const loginGet = (req: Request, res: Response): void => {
-  res.render('login', { csrfToken: req.csrfToken(), layout: false });
+  res.render('login', { asset: 'login', csrfToken: req.csrfToken() });
 };
 
 export const newSession = async (req: Request, res: Response):
@@ -37,8 +37,7 @@ Promise<void> => {
 export const clearSession = async (req: Request, res: Response):
 Promise<void> => {
   await revokeCookie(req.cookies.session);
-  res.clearCookie('session');
-  res.redirect('/login');
+  res.clearCookie('session').redirect('/login');
 };
 
 export const isLoggedIn = async (

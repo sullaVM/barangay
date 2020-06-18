@@ -41,19 +41,17 @@ const signIn = () => {
   frbs
     .auth()
     .signInWithEmailAndPassword(email, password)
-    .catch((_e) => { // eslint-disable-line
+    .catch(_e => { // eslint-disable-line
       alert('Invalid email/password');
       passwordField.value = '';
     });
 };
 
 const bootstrapElements = () => {
+  const enter = e => (e.keyCode === 13 ? signIn() : null);
   document.getElementById('sign-in').addEventListener('click', signIn);
-  passwordField.addEventListener('keydown', e => {
-    if (e.keyCode === 13) {
-      signIn();
-    }
-  });
+  document.getElementById('email').addEventListener('keydown', enter);
+  passwordField.addEventListener('keydown', enter);
 };
 
 bootstrapElements();
