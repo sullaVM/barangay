@@ -45,7 +45,7 @@
     ],
     "no-unused-expressions": "warn",
     "no-unused-vars": [
-      "error",
+      "warn",
       {
         "ignoreRestSiblings": true,
         "argsIgnorePattern": "^_"

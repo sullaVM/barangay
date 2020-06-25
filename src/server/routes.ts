@@ -1,22 +1,43 @@
-import { validationResult } from 'express-validator';
-import { NextFunction, Request, Response } from 'express';
+import { formatISO } from 'date-fns';
+import {
+  Express,
+  NextFunction,
+  Request,
+  RequestHandler,
+  Response,
+} from 'express';
 
-import { createNewCookie, revokeCookie, verifyCookie } from '../firebase/auth';
+import { storeRecord } from '../firebase/store/store'; // eslint-disable-line
+import { RecordUpload, RoleInfo } from '../firebase/store/types';
+import {
+  createNewCookie,
+  createNewUser,
+  revokeCookie,
+  verifyCookie,
+  verifyToken,
+} from '../firebase/auth/auth';
 
-export const hello = (_req: Request, res: Response): void => {
+const hello = (_req: Request, res: Response): void => {
   res.setHeader('Content-Type', 'text/plain');
   res.send('OK');
 };
 
-export const loginGet = (req: Request, res: Response): void => {
+const loginGet = (req: Request, res: Response): void => {
   res.render('login', { asset: 'login', csrfToken: req.csrfToken() });
 };
 
-export const newSession = async (req: Request, res: Response):
+const recordGet = (req: Request, res: Response): void => {
+  res.render('record', {
+    asset: 'record',
+    csrfToken: req.csrfToken(),
+    maxDate: formatISO(new Date(), { representation: 'date' }),
+  });
+};
+
+const newSession = async (req: Request, res: Response):
 Promise<void> => {
-  const err = validationResult(req);
-  if (!err.isEmpty()) {
-    res.status(422).json({ errors: err.array() });
+  if (!req.body.token) {
+    res.status(400).json({ error: 'Missing token' });
     return;
   }
 
@@ -34,17 +55,69 @@ Promise<void> => {
   }).redirect('/');
 };
 
-export const clearSession = async (req: Request, res: Response):
+const clearSession = async (req: Request, res: Response):
 Promise<void> => {
   await revokeCookie(req.cookies.session);
   res.clearCookie('session').redirect('/login');
 };
 
-export const isLoggedIn = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> => {
+const addRecord = async (req: Request, res: Response): Promise<void> => {
+  if (!req.body.token) {
+    res.status(400).json({ error: 'Missing token' });
+  }
+
+  const decoded = await verifyToken(req.body.token);
+  if (!decoded) {
+    res.status(401).json({ error: 'Bad token' });
+  }
+
+  if (!req.body.info) {
+    res.status(400).json({ error: 'Missing record' });
+  }
+
+  const { info } = req.body;
+  const upperInfo = Object.keys(info).reduce((acc, k) => (
+    typeof info[k] === 'string'
+      ? { ...acc, [k]: info[k].toUpperCase() }
+      : acc),
+  info as RecordUpload);
+
+  const now = new Date();
+  const role: RoleInfo = { email: decoded.email, name: decoded.displayName };
+
+  if (await storeRecord({
+    ...upperInfo,
+    dateAccomplished: now,
+    lastChanged: { role, timestamp: now },
+    submittedByRole: role,
+  })) {
+    res.sendStatus(201);
+  } else {
+    res.sendStatus(400);
+  }
+};
+
+const newUserWithKey = async (req: Request, res: Response): Promise<void> => {
+  if (req.query.key !== process.env.SECRET_KEY) {
+    res.status(401).send('Bad access key');
+    return;
+  }
+
+  if (!req.query.name || !req.query.email) {
+    res.status(400).send('Missing query parameters "name" or "email"');
+    return;
+  }
+
+  const { name, email, password } = req.query;
+  res.json(await createNewUser(
+    name.toString(),
+    email.toString(),
+    password.toString(),
+  ));
+};
+
+const isLoggedIn = async (req: Request, res: Response, next: NextFunction):
+Promise<void> => {
   if (!req.cookies.session) {
     return res.redirect('/login');
   }
@@ -54,4 +127,15 @@ export const isLoggedIn = async (
   }
 
   return res.redirect('/login');
+};
+
+export default (app: Express, csrf: RequestHandler): void => {
+  app.get('/', isLoggedIn, hello);
+  app.get('/login', csrf, loginGet);
+  app.get('/record', csrf, recordGet);
+  app.get('/api/logout', clearSession);
+  app.get('/api/access/newAccount', newUserWithKey);
+
+  app.post('/api/newSession', csrf, newSession);
+  app.post('/api/addRecord', csrf, addRecord);
 };

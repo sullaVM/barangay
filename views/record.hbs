@@ -1,0 +1,83 @@
+<div id="content">
+  <h3>
+    Individual Record of Barangay Inhabitant
+  </h3>
+
+  <form id="app">
+    <input type="hidden" id="_csrf" value="{{ csrfToken }}">
+
+    <label for="region">Region:</label>
+    <input type="text" v-model="info.region" disabled><br>
+
+    <label for="province">Province:</label>
+    <input type="text" v-model="info.province" disabled><br>
+
+    <label for="city">City:</label>
+    <input type="text" v-model="info.city" disabled><br>
+
+    <label for="barangay">Barangay:</label>
+    <input type="text" v-model="info.barangay" disabled><br>
+
+    <label for="lastName">Last Name:</label>
+    <input type="text" v-model.lazy="info.lastName" v-on:input="uppercase" required><br>
+
+    <label for="firstName">First Name:</label>
+    <input type="text" v-model.lazy="info.firstName" v-on:input="uppercase" required><br>
+
+    <label for="middleName">Middle Name:</label>
+    <input type="text" v-model.lazy="info.middleName" v-on:input="uppercase" required><br>
+
+    <label for="extName">Ext Name:</label>
+    <input type="text" v-model.lazy="info.extName" v-on:input="uppercase" required><br>
+
+    <label for="dob">Date of Birth:</label><br>
+    <input type="date" max="{{ maxDate }}" v-model="info.dob" required><br><br>
+
+    <label for="placeOfBirth">Place of Birth:</label>
+    <input type="text" v-model.lazy="info.placeOfBirth" v-on:input="uppercase" required><br>
+
+    <label for="sex">Sex:</label>
+    <select v-model="info.sex">
+      <option value="MALE">MALE</option>
+      <option value="FEMALE">FEMALE</option>
+    </select><br>
+
+    <label for="maritalStatus">Marital Status:</label>
+    <select v-model="info.maritalStatus">
+      <option value="SINGLE">SINGLE</option>
+      <option value="MARRIED">MARRIED</option>
+      <option value="WIDOWED">WIDOWED</option>
+      <option value="SEPARATED">SEPARATED</option>
+    </select><br>
+
+    <label for="citizenship">Citizenship:</label>
+    <input type="text" v-model.lazy="info.citizenship" v-on:input="uppercase" required><br>
+
+    <label for="occupation">Occupation:</label>
+    <input type="text" v-model.lazy="info.occupation" v-on:input="uppercase" required><br>
+
+    <label for="houseAddressNum">House Number:</label>
+    <input type="text" v-model.lazy="info.houseAddressNum" v-on:input="uppercase"><br>
+
+    <label for="street">Street:</label>
+    <input type="text" v-on:input="uppercase" v-model.lazy="info.street" required><br>
+
+    <label for="purok">Purok:</label>
+    <input type="text" v-on:input="uppercase" v-model.lazy="info.purok" required><br>
+
+    <label for="sitio">Sitio:</label>
+    <input type="text" v-on:input="uppercase" v-model.lazy="info.sitio" required><br>
+
+    <label for="householdNum">Household Number:</label>
+    <input type="text" v-on:input="uppercase" v-model.lazy="info.householdNum" required><br>
+
+    <label for="houseHeadRelation">Relation to Household Head:</label>
+    <input type="text" v-on:input="uppercase" v-model.lazy="info.houseHeadRelation" required><br><br>
+
+    <button type="button" v-on:click="postData">Submit</button>
+    <div id="submitLabel">
+      <p v-if="successSeen">Record submitted successfully.</p>
+      <p v-if="failureSeen">Unable to submit record, please try again later.</p>
+    </div>
+  </form>
+</div>

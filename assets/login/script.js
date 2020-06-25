@@ -1,25 +1,16 @@
-const frbs = firebase; // eslint-disable-line
+firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 
-frbs.initializeApp({
-  apiKey: 'AIzaSyDQiIrJkE24EksendINj-X-F6Ei5LYxMe4',
-  appId: '1:927585336513:web:93bdaca3cd10f62e87e840',
-  authDomain: 'barangay-0000.firebaseapp.com',
-  databaseURL: 'https://barangay-0000.firebaseio.com',
-  messagingSenderId: '927585336513',
-  projectId: 'barangay-0000',
-  storageBucket: 'barangay-0000.appspot.com',
-});
-
-frbs.auth().setPersistence(frbs.auth.Auth.Persistence.LOCAL);
-
-frbs.auth().onAuthStateChanged(async user => {
+firebase.auth().onAuthStateChanged(async user => {
   if (user) {
     const token = await user.getIdToken();
     try {
-      await axios.post('/api/newSession', { // eslint-disable-line
+      const res = await axios.post('/api/newSession', {
         _csrf: document.getElementById('_csrf').value,
         token,
       });
+      if (res.error) {
+        await firebase.auth().signOut();
+      }
       window.location.href = window.location.origin;
     } catch (_e) {
       alert('Unable to sign in, please try again');
@@ -38,11 +29,11 @@ const signIn = () => {
     return;
   }
 
-  frbs
+  firebase
     .auth()
     .signInWithEmailAndPassword(email, password)
-    .catch(_e => { // eslint-disable-line
-      alert('Invalid email/password');
+    .catch(_e => {
+      alert('Invalid email or password');
       passwordField.value = '';
     });
 };
