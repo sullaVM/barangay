@@ -7,8 +7,6 @@ import {
   Response,
 } from 'express';
 
-import { storeRecord } from '../firebase/store/store'; // eslint-disable-line
-import { RecordUpload, RoleInfo } from '../firebase/store/types';
 import {
   createNewCookie,
   createNewUser,
@@ -16,6 +14,8 @@ import {
   verifyCookie,
   verifyToken,
 } from '../firebase/auth/auth';
+import { getRecords, storeRecord } from '../firebase/store/store';
+import { RecordUpload, RoleInfo } from '../firebase/store/types';
 
 const hello = (_req: Request, res: Response): void => {
   res.setHeader('Content-Type', 'text/plain');
@@ -64,15 +64,18 @@ Promise<void> => {
 const addRecord = async (req: Request, res: Response): Promise<void> => {
   if (!req.body.token) {
     res.status(400).json({ error: 'Missing token' });
+    return;
   }
 
   const decoded = await verifyToken(req.body.token);
   if (!decoded) {
     res.status(401).json({ error: 'Bad token' });
+    return;
   }
 
   if (!req.body.info) {
-    res.status(400).json({ error: 'Missing record' });
+    res.status(400).json({ error: 'Missing info object' });
+    return;
   }
 
   const { info } = req.body;
@@ -95,6 +98,26 @@ const addRecord = async (req: Request, res: Response): Promise<void> => {
   } else {
     res.sendStatus(400);
   }
+};
+
+const findRecords = async (req: Request, res: Response): Promise<void> => {
+  if (!req.body.token) {
+    res.status(400).json({ error: 'Missing token' });
+    return;
+  }
+
+  const decoded = await verifyToken(req.body.token);
+  if (!decoded) {
+    res.status(401).json({ error: 'Bad token' });
+    return;
+  }
+
+  if (!req.body.info) {
+    res.status(400).json({ error: 'Missing info object' });
+    return;
+  }
+
+  res.json(await getRecords(req.body.info));
 };
 
 const newUserWithKey = async (req: Request, res: Response): Promise<void> => {
@@ -138,4 +161,5 @@ export default (app: Express, csrf: RequestHandler): void => {
 
   app.post('/api/newSession', csrf, newSession);
   app.post('/api/addRecord', csrf, addRecord);
+  app.post('/api/findRecords', findRecords);
 };

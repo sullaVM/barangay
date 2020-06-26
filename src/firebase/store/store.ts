@@ -1,8 +1,8 @@
 import { firestore } from 'firebase-admin';
 
-import { Record } from './types';
+import { Record, RecordIdentifier } from './types';
 
-const identifier = (record: Record): string => `records/${[
+const identifier = (record: Record | RecordIdentifier): string => `records/${[
   record.householdNum,
   record.lastName,
   record.firstName,
@@ -17,4 +17,20 @@ export const storeRecord = async (record: Record): Promise<boolean> => {
 
   await ref.set(record);
   return true;
+};
+
+export const getRecords = async (iden: RecordIdentifier): Promise<Record[]> => {
+  if (iden.householdNum) {
+    const doc = await firestore().doc(identifier(iden)).get();
+    return doc.exists ? [doc.data()] as Record[] : [];
+  }
+
+  const snapshot = await firestore().collection('records')
+    .where('lastName', '==', iden.lastName)
+    .where('firstName', '==', iden.firstName)
+    .where('dob', '==', iden.dob)
+    .get();
+  const records = [];
+  snapshot.forEach(doc => records.push(doc.data()));
+  return records;
 };

@@ -21,7 +21,7 @@ export interface RecordIdentifier {
   lastName: string;
   firstName: string;
   dob: Date;
-  householdNum: number;
+  householdNum?: number;
 }
 
 export interface RecordMetadata {
