@@ -11,7 +11,7 @@ firebase.auth().onAuthStateChanged(async user => {
       if (res.error) {
         await firebase.auth().signOut();
       }
-      window.location.href = window.location.origin;
+      window.location.href = `${window.location.origin}/record`;
     } catch (_e) {
       alert('Unable to sign in, please try again');
     }

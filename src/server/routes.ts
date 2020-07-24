@@ -23,15 +23,24 @@ const hello = (_req: Request, res: Response): void => {
 };
 
 const loginGet = (req: Request, res: Response): void => {
-  res.render('login', { asset: 'login', csrfToken: req.csrfToken() });
+  res.render('login', {
+    csrfToken: req.csrfToken(),
+    css: 'login',
+    js: 'login',
+  });
 };
 
 const recordGet = (req: Request, res: Response): void => {
   res.render('record', {
-    asset: 'record',
     csrfToken: req.csrfToken(),
+    css: 'record',
+    js: 'record',
     maxDate: formatISO(new Date(), { representation: 'date' }),
   });
+};
+
+const searchGet = (_req: Request, res: Response): void => {
+  res.render('search', { css: 'record', js: 'search' });
 };
 
 const newSession = async (req: Request, res: Response):
@@ -100,7 +109,7 @@ const addRecord = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-const findRecords = async (req: Request, res: Response): Promise<void> => {
+const searchRecords = async (req: Request, res: Response): Promise<void> => {
   if (!req.body.token) {
     res.status(400).json({ error: 'Missing token' });
     return;
@@ -156,10 +165,11 @@ export default (app: Express, csrf: RequestHandler): void => {
   app.get('/', isLoggedIn, hello);
   app.get('/login', csrf, loginGet);
   app.get('/record', csrf, recordGet);
+  app.get('/search', searchGet);
   app.get('/api/logout', clearSession);
   app.get('/api/access/newAccount', newUserWithKey);
 
   app.post('/api/newSession', csrf, newSession);
   app.post('/api/addRecord', csrf, addRecord);
-  app.post('/api/findRecords', findRecords);
+  app.post('/api/searchRecords', searchRecords);
 };

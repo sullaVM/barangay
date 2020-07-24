@@ -1,0 +1,30 @@
+<div id="content">
+  <h3>
+    Search Individual Record of Barangay Inhabitant
+  </h3>
+
+  <form id="app">
+    <label for="lastName">Last Name:</label>
+    <input type="text" v-model.lazy="info.lastName" v-on:input="uppercase" required><br>
+
+    <label for="firstName">First Name:</label>
+    <input type="text" v-model.lazy="info.firstName" v-on:input="uppercase" required><br>
+
+    <label for="dob">Date of Birth:</label><br>
+    <input type="date" max="{{ maxDate }}" v-model="info.dob" required><br><br><br>
+
+    <label for="checkbox">Tick this box if you know the household number:</label>
+    <input type="checkbox" v-model="checkbox"><br><br>
+
+    <div v-if="checkbox">
+      <label for="householdNum">Household Number:</label>
+      <input type="text" v-on:input="uppercase" v-model.lazy="info.householdNum"><br>
+    </div>
+
+    <button type="button" v-on:click="postData">Submit</button>
+    <div id="submitLabel">
+      <p v-if="noRecords">No records found.</p>
+      <p v-if="failure">Unable to search records, please try again later.</p>
+    </div>
+  </form>
+</div>

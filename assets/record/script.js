@@ -37,13 +37,13 @@ const app = new Vue({
   },
   methods: {
     async postData() {
-      if (Object.values(this.$data.info).some(e => !e)) {
+      if (Object.values(this.info).some(e => !e)) {
         return;
       }
 
       const res = await axios.post('/api/addRecord', {
         _csrf: document.getElementById('_csrf').value,
-        info: this.$data.info,
+        info: this.info,
         token,
       });
       if (res.error) {
@@ -60,5 +60,3 @@ const app = new Vue({
   },
   el: '#app',
 });
-
-// bootstrapElements();
