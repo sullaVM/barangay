@@ -21,6 +21,7 @@ const app = new Vue({
     },
     noRecords: false,
   },
+  el: '#app',
   methods: {
     async postData() {
       const {
@@ -35,7 +36,7 @@ const app = new Vue({
         delete obj.householdNum;
       }
 
-      const res = await axios.post('/api/searchRecords', obj);
+      const res = await axios.post('/api/searchPerson', obj);
       if (res.error) {
         this.noRecords = false;
         this.failure = true;
@@ -50,5 +51,4 @@ const app = new Vue({
       e.target.value = e.target.value.toUpperCase();
     },
   },
-  el: '#app',
 });

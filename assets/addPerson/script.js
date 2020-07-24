@@ -35,6 +35,7 @@ const app = new Vue({
     },
     successSeen: false,
   },
+  el: '#app',
   methods: {
     async postData() {
       if (Object.values(this.info).some(e => !e)) {
@@ -58,5 +59,4 @@ const app = new Vue({
       e.target.value = e.target.value.toUpperCase();
     },
   },
-  el: '#app',
 });
