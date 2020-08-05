@@ -17,11 +17,6 @@ import {
 import { getRecords, storeRecord } from '../firebase/store/store';
 import { RecordUpload, RoleInfo } from '../firebase/store/types';
 
-const hello = (_req: Request, res: Response): void => {
-  res.setHeader('Content-Type', 'text/plain');
-  res.send('OK');
-};
-
 const dashboardGet = (_req: Request, res: Response): void => {
   res.render('dashboard', {
     layout: 'main',

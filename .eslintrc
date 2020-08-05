@@ -77,15 +77,6 @@
           "multiple"
         ]
       }
-    ],
-    "sort-keys": [
-      "error",
-      "asc",
-      {
-        "caseSensitive": true,
-        "natural": true,
-        "minKeys": 2
-      }
     ]
   }
 }
