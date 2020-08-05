@@ -50,6 +50,7 @@ html {
   height: 40px;
   background-color: #1484c8;
   color: #ffffff;
+  border: 0;
   border-radius: 4px;
   font-size: 16px;
 }

@@ -36,7 +36,7 @@ h3 {
   background-color: #3e9ad2;
   position: fixed;
   margin: 0;
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
 #left-nav a,
@@ -46,10 +46,12 @@ h3 {
 }
 
 #right-data {
-  width: 75%;
+  position: relative;
+  width:75%;
+  left: 25%;
   height: 100vh;
   position: relative;
-  margin-left: 25%;
+  overflow-x: hidden;
 }
 
 /* ----------------------------------- */

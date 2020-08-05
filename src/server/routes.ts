@@ -41,6 +41,7 @@ const addPersonGet = (req: Request, res: Response): void => {
   res.render('addPerson', {
     csrfToken: req.csrfToken(),
     js: 'addPerson',
+    title: 'Register a Resident',
     maxDate: formatISO(new Date(), { representation: 'date' }),
   });
 };
