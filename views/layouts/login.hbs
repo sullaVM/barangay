@@ -6,48 +6,11 @@
   <title>Barangay</title>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/{{ css }}/style.css">
 </head>
 
 <body>
-   <div id="left-nav">
-    <div id="menu-title">
-      BARANGAY BOLOBOLO
-    </div>
-
-    <nav>
-    <a href='/'>
-      <div class="action-link">
-        Dashboard
-      </div>
-    </a>
-
-    <a href="/addPerson">
-      <div class="action-link">
-        Register a Resident
-      </div>
-    </a>
-
-    <a href="/help">
-      <div class="action-link">
-        Help
-      </div>
-    </a>
-    </nav>
-
-    <div id="sign-out"><span onclick='signOut()'>Sign Out</span></div>
-  </div>
-
-  <div id="right-data">
-    <div id="page-title">
-      {{ title }}
-    </div>
-
-    <div id="content">
-      {{{ body }}}
-    </div>
-  </div>
-
+   {{{ body }}}
 
   <script src="https://cdn.jsdelivr.net/npm/vue"></script>
   <script src="https://www.gstatic.com/firebasejs/7.8.2/firebase-app.js"></script>
@@ -64,7 +27,6 @@
       storageBucket: 'barangay-0000.appspot.com',
     });
   </script>
-  <script type="text/javascript" src="/script.js"></script>
   <script type="text/javascript" src="/{{ js }}/script.js"></script>
 </body>
 

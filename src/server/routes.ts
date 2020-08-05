@@ -22,8 +22,15 @@ const hello = (_req: Request, res: Response): void => {
   res.send('OK');
 };
 
+const dashboardGet = (_req: Request, res: Response): void => {
+  res.render('dashboard', {
+    layout: 'main',
+  });
+};
+
 const loginGet = (req: Request, res: Response): void => {
   res.render('login', {
+    layout: 'login',
     csrfToken: req.csrfToken(),
     css: 'login',
     js: 'login',
@@ -33,7 +40,6 @@ const loginGet = (req: Request, res: Response): void => {
 const addPersonGet = (req: Request, res: Response): void => {
   res.render('addPerson', {
     csrfToken: req.csrfToken(),
-    css: 'addPerson',
     js: 'addPerson',
     maxDate: formatISO(new Date(), { representation: 'date' }),
   });
@@ -162,7 +168,7 @@ Promise<void> => {
 };
 
 export default (app: Express, csrf: RequestHandler): void => {
-  app.get('/', isLoggedIn, hello);
+  app.get('/', isLoggedIn, dashboardGet);
   app.get('/login', csrf, loginGet);
   app.get('/addPerson', csrf, addPersonGet);
   app.get('/searchPerson', searchPersonGet);

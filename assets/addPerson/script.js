@@ -1,14 +1,3 @@
-let token = null;
-
-firebase.auth().onAuthStateChanged(async user => {
-  if (user) {
-    token = await user.getIdToken(true);
-  } else {
-    await firebase.auth().signOut();
-    window.location = window.location.origin;
-  }
-});
-
 const app = new Vue({
   data: {
     failureSeen: false,
