@@ -1,27 +1,7 @@
 const app = new Vue({
   data: {
     failureSeen: false,
-    info: {
-      barangay: 'BOLOBOLO',
-      citizenship: '',
-      city: 'EL SALVADOR CITY',
-      dob: '',
-      extName: '',
-      firstName: '',
-      houseHeadRelation: '',
-      householdNum: '',
-      lastName: '',
-      maritalStatus: '',
-      middleName: '',
-      occupation: '',
-      placeOfBirth: '',
-      province: 'MISAMIS ORIENTAL',
-      purok: '',
-      region: 'X',
-      sex: '',
-      sitio: '',
-      street: '',
-    },
+    info,
     successSeen: false,
   },
   el: '#app',
@@ -41,8 +21,9 @@ Household Number`);
         return;
       }
 
-      const res = await axios.post('/api/addPerson', {
+      const res = await axios.post('/api/modifyPerson', {
         _csrf: document.getElementById('_csrf').value,
+        key: document.getElementById('_key').value,
         info: this.info,
         token,
       });

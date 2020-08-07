@@ -14,8 +14,16 @@ import {
   verifyCookie,
   verifyToken,
 } from '../firebase/auth/auth';
-import { getRecords, storeRecord, getNRecords } from '../firebase/store/store';
-import { RecordUpload, RoleInfo } from '../firebase/store/types';
+import {
+  getNRecords,
+  getRecords,
+  identifier,
+  modifyRecords,
+  storeRecord,
+} from '../firebase/store/store';
+/* eslint-disable */
+import { RecordUpload, RoleInfo} from '../firebase/store/types';
+/* eslint-enable */
 
 const dashboardGet = (_req: Request, res: Response): void => {
   res.render('dashboard', {
@@ -44,7 +52,39 @@ const addPersonGet = (req: Request, res: Response): void => {
 };
 
 const searchPersonGet = (_req: Request, res: Response): void => {
-  res.render('searchPerson', { css: 'addPerson', js: 'searchPerson' });
+  res.render('searchPerson', { js: 'searchPerson' });
+};
+
+const modifyPersonGet = async (req: Request, res: Response): Promise<void> => {
+  const {
+    lastName, firstName, dob, householdNum,
+  } = req.query;
+  if (!lastName || !firstName || !dob || !householdNum) {
+    res.status(400).send('Missing "lastName", "firstName", '
+      + '"dob", "householdNum" query parameters.');
+    return;
+  }
+
+  const [person] = await getRecords({
+    lastName: lastName as string,
+    firstName: firstName as string,
+    dob: dob as string,
+    householdNum: householdNum as string,
+  });
+  if (!person) {
+    res.status(400).send('Internal error: no records returned.');
+    return;
+  }
+
+  const opts: { [k: string]: any } = {
+    js: 'modifyPerson',
+    csrfToken: req.csrfToken(),
+    key: identifier(person),
+    maxDate: formatISO(new Date(), { representation: 'date' }),
+    ...person,
+  };
+
+  res.render('modifyPerson', opts);
 };
 
 const getNRecordsGet = async (_req: Request, res: Response): Promise<void> => {
@@ -112,30 +152,64 @@ const addPersonPost = async (req: Request, res: Response): Promise<void> => {
     lastChanged: { role, timestamp: now },
     submittedByRole: role,
   })) {
-    res.sendStatus(201);
+    res.sendStatus(200);
   } else {
     res.sendStatus(400);
   }
 };
 
 const searchPersonPost = async (req: Request, res: Response): Promise<void> => {
-  if (!req.body.token) {
+  const { token, info } = req.body;
+  if (!token) {
     res.status(400).json({ error: 'Missing token' });
     return;
   }
 
-  const decoded = await verifyToken(req.body.token);
+  const decoded = await verifyToken(token);
   if (!decoded) {
     res.status(401).json({ error: 'Bad token' });
     return;
   }
 
-  if (!req.body.info) {
+  if (!info) {
     res.status(400).json({ error: 'Missing info object' });
     return;
   }
 
-  res.json(await getRecords(req.body.info));
+  res.json(await getRecords(info));
+};
+
+const modifyPersonPost = async (req: Request, res: Response): Promise<void> => {
+  const { token, info, key } = req.body;
+  if (!token) {
+    res.status(400).json({ error: 'Missing token' });
+    return;
+  }
+
+  const decoded = await verifyToken(token);
+  if (!decoded) {
+    res.status(401).json({ error: 'Bad token' });
+    return;
+  }
+
+  if (!info) {
+    res.status(400).json({ error: 'Missing info object' });
+    return;
+  }
+
+  const newInfo = {
+    ...info,
+    'lastChanged.role.email': decoded.email,
+    'lastChanged.role.name': decoded.displayName,
+    'lastChanged.timestamp': new Date(),
+  };
+  delete newInfo.lastChanged;
+
+  if (await modifyRecords(key, newInfo)) {
+    res.status(200).json(true);
+    return;
+  }
+  res.status(400).json(false);
 };
 
 const newUserWithKey = async (req: Request, res: Response): Promise<void> => {
@@ -173,8 +247,9 @@ Promise<void> => {
 export default (app: Express, csrf: RequestHandler): void => {
   app.get('/', isLoggedIn, dashboardGet);
   app.get('/login', csrf, loginGet);
-  app.get('/addPerson', csrf, addPersonGet);
-  app.get('/searchPerson', searchPersonGet);
+  app.get('/addPerson', isLoggedIn, csrf, addPersonGet);
+  app.get('/searchPerson', isLoggedIn, searchPersonGet);
+  app.get('/modifyPerson', isLoggedIn, csrf, modifyPersonGet);
   app.get('/api/logout', clearSession);
   app.get('/api/access/newAccount', newUserWithKey);
   app.get('/api/getNRecords', isLoggedIn, getNRecordsGet);
@@ -182,4 +257,5 @@ export default (app: Express, csrf: RequestHandler): void => {
   app.post('/api/newSession', csrf, newSession);
   app.post('/api/addPerson', csrf, addPersonPost);
   app.post('/api/searchPerson', searchPersonPost);
+  app.post('/api/modifyPerson', csrf, modifyPersonPost);
 };

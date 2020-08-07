@@ -20,8 +20,8 @@ interface RecordBase {
 export interface RecordIdentifier {
   lastName: string;
   firstName: string;
-  dob: Date;
-  householdNum?: number;
+  dob: string;
+  householdNum?: string;
 }
 
 export interface RecordMetadata {
