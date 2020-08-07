@@ -1,18 +1,73 @@
 var residentApp = new Vue({
   delimiters: ["[[","]]"],
-  el: '#residentsTable',
+  el: '#residents-table',
   data: {
     records: [],
+    recordsSize: 0,
+    isLoading: true,
   },
   methods: {
     getNRecords: async function() {
       const res = await axios.get('/api/getNRecords');
       if (!res.error) {
-        console.log(res.data);
         this.records = res.data;
+        this.isLoading = false;
+        this.recordsSize = this.records.length;
       }
     }
   }
 });
 
-residentApp.getNRecords();
+const app = new Vue({
+  delimiters: ["[[","]]"],
+  data: {
+    records: [],
+    checkbox: false,
+    failure: false,
+    info: {
+      dob: '',
+      firstName: '',
+      householdNum: '',
+      lastName: '',
+    },
+    noRecords: false,
+    isLoading: true,
+  },
+  el: '#app',
+  methods: {
+    async postData() {
+      const {
+        dob, firstName, householdNum, lastName,
+      } = this.info;
+      if (!this.checkbox && (!lastName || !firstName || !dob)) {
+        alert('Please supply last name, first name and date of birth.');
+        return;
+      }
+      if (this.checkbox && !householdNum) {
+        alert('Please supply a household number.');
+        return;
+      }
+
+      const obj = { info: this.info, token };
+      if (!this.checkbox) {
+        delete obj.householdNum;
+      }
+
+      const res = await axios.post('/api/searchPerson', obj);
+      if (res.error) {
+        this.noRecords = false;
+        this.failure = true;
+      } else if (res.data.length) {
+        console.log(res.data);
+        this.records = res.data;
+        this.isLoading = false;
+      } else {
+        this.noRecords = true;
+        this.failure = false;
+      }
+    },
+    uppercase(e) {
+      e.target.value = e.target.value.toUpperCase();
+    },
+  },
+});

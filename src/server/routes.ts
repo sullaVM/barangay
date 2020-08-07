@@ -15,7 +15,7 @@ import {
   verifyToken,
 } from '../firebase/auth/auth';
 import {
-  getNRecords,
+  getHouseholdRecords,
   getRecords,
   identifier,
   modifyRecords,
@@ -87,8 +87,8 @@ const modifyPersonGet = async (req: Request, res: Response): Promise<void> => {
   res.render('modifyPerson', opts);
 };
 
-const getNRecordsGet = async (_req: Request, res: Response): Promise<void> => {
-  const records = await getNRecords(10);
+const getHousehold = async (_req: Request, res: Response): Promise<void> => {
+  const records = await getHouseholdRecords('');
   res.send(records);
 };
 
@@ -252,7 +252,7 @@ export default (app: Express, csrf: RequestHandler): void => {
   app.get('/modifyPerson', isLoggedIn, csrf, modifyPersonGet);
   app.get('/api/logout', clearSession);
   app.get('/api/access/newAccount', newUserWithKey);
-  app.get('/api/getNRecords', isLoggedIn, getNRecordsGet);
+  app.get('/api/getHousehold', isLoggedIn, getHousehold);
 
   app.post('/api/newSession', csrf, newSession);
   app.post('/api/addPerson', csrf, addPersonPost);

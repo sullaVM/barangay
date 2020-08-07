@@ -22,8 +22,12 @@ export const storeRecord = async (record: Record): Promise<boolean> => {
 
 export const getRecords = async (iden: RecordIdentifier): Promise<Record[]> => {
   if (iden.householdNum) {
-    const doc = await firestore().doc(identifier(iden)).get();
-    return doc.exists ? [doc.data()] as Record[] : [];
+    if (iden.firstName && iden.lastName && iden.dob) {
+      const doc = await firestore().doc(identifier(iden)).get();
+      return doc.exists ? [doc.data()] as Record[] : [];
+    } 
+    console.log('searching household');
+    return await getHouseholdRecords(iden.householdNum);
   }
 
   const snapshot = await firestore().collection('records')
@@ -36,11 +40,10 @@ export const getRecords = async (iden: RecordIdentifier): Promise<Record[]> => {
   return records;
 };
 
-export const getNRecords = async (count: number): Promise<Record[]> => {
+export const getHouseholdRecords = async (num: string): Promise<Record[]> => {
   const snapshot = await firestore()
     .collection('records')
-    .orderBy('lastName')
-    .limit(15)
+    .where('householdNum', '==', num)
     .get();
   const records = [];
   snapshot.forEach(doc => records.push(doc.data()));

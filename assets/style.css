@@ -102,7 +102,7 @@ h3 {
 }
 
 #content {
-  margin-top: 10px;
+  margin: 10px 0 100px 0;
   padding: 5px 15px;
   max-width: 600px;
 }
@@ -174,7 +174,7 @@ textarea {
 }
 
 p {
-  margin: 3px 0;
+  margin: 10px 10px;
 }
 
 /* ----------------------------------- */

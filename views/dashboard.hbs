@@ -1,9 +1,40 @@
 <div class="highlight">
   <p>Welcome to Barangay Bolobolo Residents Portal!</p>
+  <p>This app allows you to maintain a record of your local residents conveniently and securely. </p>
+  <p>
+    To get started, select the <b>Register a Resident</b> option on the navigation panel to your left. 
+    If you already have residents registered and would like to search for their record, use this dashboard 
+    to search for them below.
+  </p>
 </div>
 
-<h1>Registered Residents</h1>
-<div id="residentsTable">
+<h1>Search Residents or Households</h1>
+<div id="app">
+  <form>
+    <label for="lastName">Last Name:</label>
+    <input type="text" v-model.lazy="info.lastName" v-on:input="uppercase" required><br>
+
+    <label for="firstName">First Name:</label>
+    <input type="text" v-model.lazy="info.firstName" v-on:input="uppercase" required><br>
+
+    <label for="dob">Date of Birth:</label><br>
+    <input type="date" max="{{ maxDate }}" v-model="info.dob" required><br><br><br>
+
+    <label for="checkbox">Select this box if you know the household number:</label>
+    <input type="checkbox" v-model="checkbox"><br><br>
+
+    <div v-if="checkbox">
+      <label for="householdNum">Household Number:</label>
+      <input type="text" v-on:input="uppercase" v-model.lazy="info.householdNum"><br>
+    </div>
+
+    <button type="button" v-on:click="postData">Submit</button>
+    <div id="submitLabel">
+      <p v-if="noRecords">No records found.</p>
+      <p v-if="failure">Unable to search records, please try again later.</p>
+    </div>
+  </form>
+
   <table>
     <tr>
       <th>Last Name</th>
@@ -11,6 +42,7 @@
       <th>Middle Name</th>
       <th>Date of Birth</th>
       <th>Sex</th>
+      <th>Household No.</th>
     </tr>
     <tr v-for="record in records">
       <td>[[ record.lastName ]]</td>
@@ -18,8 +50,12 @@
       <td>[[ record.middleName ]]</td>
       <td>[[ record.dob ]]</td>
       <td>[[ record.sex ]]</td>
+      <td>[[ record.householdNum ]]</td>
     </tr>
   </table>
+  <p v-if="isLoading">Searching...</p>
 </div>
-10 of 1000 residents
 
+<div id="residents-table">
+
+</div>
