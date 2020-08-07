@@ -9,7 +9,7 @@ const identifier = (record: Record | RecordIdentifier): string => `records/${[
   record.dob,
 ].join(',')}`;
 
-export const storeRecord = async (record: Record): Promise<boolean> => {
+export const storeRecord =  async (record: Record): Promise<boolean> => {
   const ref = firestore().doc(identifier(record));
   if ((await ref.get()).exists) {
     return false;
@@ -34,3 +34,10 @@ export const getRecords = async (iden: RecordIdentifier): Promise<Record[]> => {
   snapshot.forEach(doc => records.push(doc.data()));
   return records;
 };
+
+export const getNRecords = async (count: number): Promise<Record[]> => {
+  const snapshot = await firestore().collection('records').orderBy('lastName').limit(15).get();
+  const records = [];
+  snapshot.forEach(doc => records.push(doc.data()));
+  return records;
+}

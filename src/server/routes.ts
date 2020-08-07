@@ -14,12 +14,14 @@ import {
   verifyCookie,
   verifyToken,
 } from '../firebase/auth/auth';
-import { getRecords, storeRecord } from '../firebase/store/store';
+import { getRecords, storeRecord, getNRecords } from '../firebase/store/store';
 import { RecordUpload, RoleInfo } from '../firebase/store/types';
 
 const dashboardGet = (_req: Request, res: Response): void => {
   res.render('dashboard', {
     layout: 'main',
+    title: 'Dashboard',
+    js: 'dashboard',
   });
 };
 
@@ -43,6 +45,11 @@ const addPersonGet = (req: Request, res: Response): void => {
 
 const searchPersonGet = (_req: Request, res: Response): void => {
   res.render('searchPerson', { css: 'addPerson', js: 'searchPerson' });
+};
+
+const getNRecordsGet = async (_req: Request, res: Response): Promise<void> => {
+  const records = await getNRecords(10);
+  res.send(records);
 };
 
 const newSession = async (req: Request, res: Response):
@@ -170,6 +177,7 @@ export default (app: Express, csrf: RequestHandler): void => {
   app.get('/searchPerson', searchPersonGet);
   app.get('/api/logout', clearSession);
   app.get('/api/access/newAccount', newUserWithKey);
+  app.get('/api/getNRecords', isLoggedIn, getNRecordsGet);
 
   app.post('/api/newSession', csrf, newSession);
   app.post('/api/addPerson', csrf, addPersonPost);

@@ -26,12 +26,12 @@ const app = new Vue({
   },
   el: '#app',
   methods: {
-    async postData() {
+    postData: async function() {
       if (Object.values(this.info).some(e => !e)) {
         return;
       }
 
-      const res = await axios.post('/api/addRecord', {
+      const res = await axios.post('/api/addPerson', {
         _csrf: document.getElementById('_csrf').value,
         info: this.info,
         token,

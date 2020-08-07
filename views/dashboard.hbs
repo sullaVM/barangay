@@ -1,1 +1,25 @@
-<p>Welcome to Barangay Bolobolo Residents Portal!</p>
+<div class="highlight">
+  <p>Welcome to Barangay Bolobolo Residents Portal!</p>
+</div>
+
+<h1>Registered Residents</h1>
+<div id="residentsTable">
+  <table>
+    <tr>
+      <th>Last Name</th>
+      <th>First Name</th>
+      <th>Middle Name</th>
+      <th>Date of Birth</th>
+      <th>Sex</th>
+    </tr>
+    <tr v-for="record in records">
+      <td>[[ record.lastName ]]</td>
+      <td>[[ record.firstName ]]</td>
+      <td>[[ record.middleName ]]</td>
+      <td>[[ record.dob ]]</td>
+      <td>[[ record.sex ]]</td>
+    </tr>
+  </table>
+</div>
+10 of 1000 residents
+

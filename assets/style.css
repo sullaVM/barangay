@@ -16,7 +16,8 @@ html {
 }
 
 h1 {
-  margin: 10px 0;
+  margin-top: 20px;
+  margin-bottom: 10px;
   font-size: 21px;
 }
 
@@ -101,8 +102,9 @@ h3 {
 }
 
 #content {
+  margin-top: 10px;
   padding: 5px 15px;
-  max-width: 500px;
+  max-width: 600px;
 }
 
 /* ----------------------------------- */
@@ -160,54 +162,35 @@ textarea {
   font-size: 14px;
 }
 
-/* ----------------------------------- */
-
-#chosen-clinics {
-  list-style: none;
-}
-
-#chosen-clinics li {
-  line-height: 2;
-  display: block;
-  width: 100%;
-}
-
-#chosen-clinics li:before {
-  content: "╳ ";
-}
-
-/* ----------------------------------- */
-
-#callback {
-  width: 300px;
-  margin: 20px auto;
-  text-align: center;
-}
-
-.patient-card {
-  width: inherit;
-  background-color: #d9e9f3;
-  margin: 0;
-  padding: 15px;
-  min-height: 50px;
-}
-
-.patient-card:hover {
-  background-color: #c0d7e5;
-}
-
-.patient-card text {
-  margin-left: 5px;
-}
-
-.patient-info {
-  width: inherit;
-  background-color: #f3f3f3;
-  margin: 0 0 8px 0;
-  padding: 15px;
-  min-height: 50px;
-}
-
 #submitLabel {
   padding-bottom: 50px;
+}
+
+/* ----------------------------------- */
+
+.highlight {
+  padding: 10px;
+  background-color: #fcf4cc;
+}
+
+p {
+  margin: 3px 0;
+}
+
+/* ----------------------------------- */
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 5px;
+}
+
+th, td {
+  border: 1px solid #bcd7e7;
+  text-align: left;
+  padding: 10px;
+}
+
+tr:nth-child(even) {
+  background-color: #bcd7e7;
 }
