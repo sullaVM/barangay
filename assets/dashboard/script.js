@@ -1,69 +1,83 @@
 var residentApp = new Vue({
-  delimiters: ["[[","]]"],
-  el: '#residents-table',
+  delimiters: ["[[", "]]"],
+  el: "#residents-table",
   data: {
     records: [],
     recordsSize: 0,
     isLoading: true,
   },
   methods: {
-    getNRecords: async function() {
-      const res = await axios.get('/api/getNRecords');
+    getNRecords: async function () {
+      const res = await axios.get("/api/getNRecords");
       if (!res.error) {
         this.records = res.data;
         this.isLoading = false;
         this.recordsSize = this.records.length;
       }
-    }
-  }
+    },
+  },
 });
 
 const app = new Vue({
-  delimiters: ["[[","]]"],
+  delimiters: ["[[", "]]"],
   data: {
     records: [],
     checkbox: false,
     failure: false,
     info: {
-      dob: '',
-      firstName: '',
-      householdNum: '',
-      lastName: '',
+      dob: "",
+      firstName: "",
+      householdNum: "",
+      lastName: "",
     },
     noRecords: false,
-    isLoading: true,
+    isLoading: false,
   },
-  el: '#app',
+  el: "#app",
   methods: {
     async postData() {
-      const {
-        dob, firstName, householdNum, lastName,
-      } = this.info;
+      const { dob, firstName, householdNum, lastName } = this.info;
       if (!this.checkbox && (!lastName || !firstName || !dob)) {
-        alert('Please supply last name, first name and date of birth.');
+        alert("Please supply last name, first name and date of birth.");
         return;
       }
       if (this.checkbox && !householdNum) {
-        alert('Please supply a household number.');
+        alert("Please supply a household number.");
         return;
       }
+
+      this.isLoading = true;
 
       const obj = { info: this.info, token };
       if (!this.checkbox) {
         delete obj.householdNum;
       }
 
-      const res = await axios.post('/api/searchPerson', obj);
+      const res = await axios.post("/api/searchPerson", obj);
       if (res.error) {
         this.noRecords = false;
         this.failure = true;
+        this.isLoading = false;
       } else if (res.data.length) {
-        console.log(res.data);
-        this.records = res.data;
+        const fetchedRecords = res.data;
+        fetchedRecords.forEach((data) => {
+          data.link = "/modifyPerson?lastName=".concat(
+            data.lastName,
+            "&firstName=",
+            data.firstName,
+            "&dob=",
+            data.dob,
+            "&householdNum=",
+            data.householdNum
+          );
+          this.records.push(data);
+        });
+
         this.isLoading = false;
       } else {
         this.noRecords = true;
         this.failure = false;
+        this.isLoading = false;
       }
     },
     uppercase(e) {
@@ -71,3 +85,8 @@ const app = new Vue({
     },
   },
 });
+
+const closeHighlight = () => {
+  const highlight = document.getElementById("highlight");
+  highlight.hidden = true;
+};

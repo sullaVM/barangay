@@ -1,11 +1,11 @@
-import { formatISO } from 'date-fns';
+import { formatISO } from "date-fns";
 import {
   Express,
   NextFunction,
   Request,
   RequestHandler,
   Response,
-} from 'express';
+} from "express";
 
 import {
   createNewCookie,
@@ -13,55 +13,65 @@ import {
   revokeCookie,
   verifyCookie,
   verifyToken,
-} from '../firebase/auth/auth';
+} from "../firebase/auth/auth";
 import {
   getHouseholdRecords,
   getRecords,
   identifier,
   modifyRecords,
   storeRecord,
-} from '../firebase/store/store';
+} from "../firebase/store/store";
 /* eslint-disable */
-import { RecordUpload, RoleInfo} from '../firebase/store/types';
+import { RecordUpload, RoleInfo } from "../firebase/store/types";
 /* eslint-enable */
 
 const dashboardGet = (_req: Request, res: Response): void => {
-  res.render('dashboard', {
-    layout: 'main',
-    title: 'Dashboard',
-    js: 'dashboard',
+  res.render("dashboard", {
+    layout: "main",
+    title: "Dashboard",
+    js: "dashboard",
+  });
+};
+
+const helpGet = (_req: Request, res: Response): void => {
+  res.render("help", {
+    layout: "main",
+    title: "Help",
+    js: "help",
   });
 };
 
 const loginGet = (req: Request, res: Response): void => {
-  res.render('login', {
-    layout: 'login',
+  res.render("login", {
+    layout: "login",
     csrfToken: req.csrfToken(),
-    css: 'login',
-    js: 'login',
+    css: "login",
+    js: "login",
   });
 };
 
 const addPersonGet = (req: Request, res: Response): void => {
-  res.render('addPerson', {
+  res.render("addPerson", {
     csrfToken: req.csrfToken(),
-    js: 'addPerson',
-    title: 'Register a Resident',
-    maxDate: formatISO(new Date(), { representation: 'date' }),
+    js: "addPerson",
+    title: "Register a Resident",
+    maxDate: formatISO(new Date(), { representation: "date" }),
   });
 };
 
 const searchPersonGet = (_req: Request, res: Response): void => {
-  res.render('searchPerson', { js: 'searchPerson' });
+  res.render("searchPerson", { js: "searchPerson" });
 };
 
 const modifyPersonGet = async (req: Request, res: Response): Promise<void> => {
-  const {
-    lastName, firstName, dob, householdNum,
-  } = req.query;
+  const { lastName, firstName, dob, householdNum } = req.query;
   if (!lastName || !firstName || !dob || !householdNum) {
-    res.status(400).send('Missing "lastName", "firstName", '
-      + '"dob", "householdNum" query parameters.');
+    res
+      .status(400)
+      .send(
+        'Missing "lastName", "firstName", ' +
+          '"dob", "householdNum" query parameters.'
+      );
     return;
   }
 
@@ -72,30 +82,30 @@ const modifyPersonGet = async (req: Request, res: Response): Promise<void> => {
     householdNum: householdNum as string,
   });
   if (!person) {
-    res.status(400).send('Internal error: no records returned.');
+    res.status(400).send("Internal error: no records returned.");
     return;
   }
 
   const opts: { [k: string]: any } = {
-    js: 'modifyPerson',
+    title: "View or Modify",
+    js: "modifyPerson",
     csrfToken: req.csrfToken(),
     key: identifier(person),
-    maxDate: formatISO(new Date(), { representation: 'date' }),
+    maxDate: formatISO(new Date(), { representation: "date" }),
     ...person,
   };
 
-  res.render('modifyPerson', opts);
+  res.render("modifyPerson", opts);
 };
 
 const getHousehold = async (_req: Request, res: Response): Promise<void> => {
-  const records = await getHouseholdRecords('');
+  const records = await getHouseholdRecords("");
   res.send(records);
 };
 
-const newSession = async (req: Request, res: Response):
-Promise<void> => {
+const newSession = async (req: Request, res: Response): Promise<void> => {
   if (!req.body.token) {
-    res.status(400).json({ error: 'Missing token' });
+    res.status(400).json({ error: "Missing token" });
     return;
   }
 
@@ -106,52 +116,57 @@ Promise<void> => {
     return;
   }
 
-  res.cookie('session', session, {
-    httpOnly: true,
-    maxAge: expiresIn,
-    secure: process.env.ENV === 'production',
-  }).redirect('/');
+  res
+    .cookie("session", session, {
+      httpOnly: true,
+      maxAge: expiresIn,
+      secure: process.env.ENV === "production",
+    })
+    .redirect("/");
 };
 
-const clearSession = async (req: Request, res: Response):
-Promise<void> => {
+const clearSession = async (req: Request, res: Response): Promise<void> => {
   await revokeCookie(req.cookies.session);
-  res.clearCookie('session').redirect('/login');
+  res.clearCookie("session").redirect("/login");
 };
 
 const addPersonPost = async (req: Request, res: Response): Promise<void> => {
   if (!req.body.token) {
-    res.status(400).json({ error: 'Missing token' });
+    res.status(400).json({ error: "Missing token" });
     return;
   }
 
   const decoded = await verifyToken(req.body.token);
   if (!decoded) {
-    res.status(401).json({ error: 'Bad token' });
+    res.status(401).json({ error: "Bad token" });
     return;
   }
 
   if (!req.body.info) {
-    res.status(400).json({ error: 'Missing info object' });
+    res.status(400).json({ error: "Missing info object" });
     return;
   }
 
   const { info } = req.body;
-  const upperInfo = Object.keys(info).reduce((acc, k) => (
-    typeof info[k] === 'string'
-      ? { ...acc, [k]: info[k].toUpperCase() }
-      : acc),
-  info as RecordUpload);
+  const upperInfo = Object.keys(info).reduce(
+    (acc, k) =>
+      typeof info[k] === "string"
+        ? { ...acc, [k]: info[k].toUpperCase() }
+        : acc,
+    info as RecordUpload
+  );
 
   const now = new Date();
   const role: RoleInfo = { email: decoded.email, name: decoded.displayName };
 
-  if (await storeRecord({
-    ...upperInfo,
-    dateAccomplished: now,
-    lastChanged: { role, timestamp: now },
-    submittedByRole: role,
-  })) {
+  if (
+    await storeRecord({
+      ...upperInfo,
+      dateAccomplished: now,
+      lastChanged: { role, timestamp: now },
+      submittedByRole: role,
+    })
+  ) {
     res.sendStatus(200);
   } else {
     res.sendStatus(400);
@@ -161,18 +176,18 @@ const addPersonPost = async (req: Request, res: Response): Promise<void> => {
 const searchPersonPost = async (req: Request, res: Response): Promise<void> => {
   const { token, info } = req.body;
   if (!token) {
-    res.status(400).json({ error: 'Missing token' });
+    res.status(400).json({ error: "Missing token" });
     return;
   }
 
   const decoded = await verifyToken(token);
   if (!decoded) {
-    res.status(401).json({ error: 'Bad token' });
+    res.status(401).json({ error: "Bad token" });
     return;
   }
 
   if (!info) {
-    res.status(400).json({ error: 'Missing info object' });
+    res.status(400).json({ error: "Missing info object" });
     return;
   }
 
@@ -182,26 +197,26 @@ const searchPersonPost = async (req: Request, res: Response): Promise<void> => {
 const modifyPersonPost = async (req: Request, res: Response): Promise<void> => {
   const { token, info, key } = req.body;
   if (!token) {
-    res.status(400).json({ error: 'Missing token' });
+    res.status(400).json({ error: "Missing token" });
     return;
   }
 
   const decoded = await verifyToken(token);
   if (!decoded) {
-    res.status(401).json({ error: 'Bad token' });
+    res.status(401).json({ error: "Bad token" });
     return;
   }
 
   if (!info) {
-    res.status(400).json({ error: 'Missing info object' });
+    res.status(400).json({ error: "Missing info object" });
     return;
   }
 
   const newInfo = {
     ...info,
-    'lastChanged.role.email': decoded.email,
-    'lastChanged.role.name': decoded.displayName,
-    'lastChanged.timestamp': new Date(),
+    "lastChanged.role.email": decoded.email,
+    "lastChanged.role.name": decoded.displayName,
+    "lastChanged.timestamp": new Date(),
   };
   delete newInfo.lastChanged;
 
@@ -214,7 +229,7 @@ const modifyPersonPost = async (req: Request, res: Response): Promise<void> => {
 
 const newUserWithKey = async (req: Request, res: Response): Promise<void> => {
   if (req.query.key !== process.env.SECRET_KEY) {
-    res.status(401).send('Bad access key');
+    res.status(401).send("Bad access key");
     return;
   }
 
@@ -224,38 +239,40 @@ const newUserWithKey = async (req: Request, res: Response): Promise<void> => {
   }
 
   const { name, email, password } = req.query;
-  res.json(await createNewUser(
-    name.toString(),
-    email.toString(),
-    password.toString(),
-  ));
+  res.json(
+    await createNewUser(name.toString(), email.toString(), password.toString())
+  );
 };
 
-const isLoggedIn = async (req: Request, res: Response, next: NextFunction):
-Promise<void> => {
+const isLoggedIn = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   if (!req.cookies.session) {
-    return res.redirect('/login');
+    return res.redirect("/login");
   }
 
   if (await verifyCookie(req.cookies.session)) {
     return next();
   }
 
-  return res.redirect('/login');
+  return res.redirect("/login");
 };
 
 export default (app: Express, csrf: RequestHandler): void => {
-  app.get('/', isLoggedIn, dashboardGet);
-  app.get('/login', csrf, loginGet);
-  app.get('/addPerson', isLoggedIn, csrf, addPersonGet);
-  app.get('/searchPerson', isLoggedIn, searchPersonGet);
-  app.get('/modifyPerson', isLoggedIn, csrf, modifyPersonGet);
-  app.get('/api/logout', clearSession);
-  app.get('/api/access/newAccount', newUserWithKey);
-  app.get('/api/getHousehold', isLoggedIn, getHousehold);
+  app.get("/", isLoggedIn, dashboardGet);
+  app.get("/login", csrf, loginGet);
+  app.get("/addPerson", isLoggedIn, csrf, addPersonGet);
+  app.get("/searchPerson", isLoggedIn, searchPersonGet);
+  app.get("/modifyPerson", isLoggedIn, csrf, modifyPersonGet);
+  app.get("/help", isLoggedIn, helpGet);
+  app.get("/api/logout", clearSession);
+  app.get("/api/access/newAccount", newUserWithKey);
+  app.get("/api/getHousehold", isLoggedIn, getHousehold);
 
-  app.post('/api/newSession', csrf, newSession);
-  app.post('/api/addPerson', csrf, addPersonPost);
-  app.post('/api/searchPerson', searchPersonPost);
-  app.post('/api/modifyPerson', csrf, modifyPersonPost);
+  app.post("/api/newSession", csrf, newSession);
+  app.post("/api/addPerson", csrf, addPersonPost);
+  app.post("/api/searchPerson", searchPersonPost);
+  app.post("/api/modifyPerson", csrf, modifyPersonPost);
 };

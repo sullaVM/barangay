@@ -38,5 +38,12 @@ Household Number`);
     uppercase(e) {
       e.target.value = e.target.value.toUpperCase();
     },
+
+    edit: function() {
+      const inputs = document.querySelectorAll('input, select, button');
+      inputs.forEach(data => {
+        data.disabled = false;
+      });
+    },
   },
 });

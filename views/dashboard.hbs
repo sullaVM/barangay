@@ -1,11 +1,12 @@
-<div class="highlight">
+<div id="highlight">
   <p>Welcome to Barangay Bolobolo Residents Portal!</p>
   <p>This app allows you to maintain a record of your local residents conveniently and securely. </p>
   <p>
-    To get started, select the <b>Register a Resident</b> option on the navigation panel to your left. 
-    If you already have residents registered and would like to search for their record, use this dashboard 
+    To get started, select the <b>Register a Resident</b> option on the navigation panel to your left.
+    If you already have residents registered and would like to search for their record, use this dashboard
     to search for them below.
   </p>
+    <p><a href="#" onclick="closeHighlight()">[X] Close</a></p>
 </div>
 
 <h1>Search Residents or Households</h1>
@@ -18,23 +19,24 @@
     <input type="text" v-model.lazy="info.firstName" v-on:input="uppercase" required><br>
 
     <label for="dob">Date of Birth:</label><br>
-    <input type="date" max="{{ maxDate }}" v-model="info.dob" required><br><br><br>
+    <input type="date" max="{{ maxDate }}" v-model="info.dob" required><br><br>
 
     <label for="checkbox">Select this box if you know the household number:</label>
-    <input type="checkbox" v-model="checkbox"><br><br>
+    <input type="checkbox" v-model="checkbox"><br>
 
     <div v-if="checkbox">
       <label for="householdNum">Household Number:</label>
       <input type="text" v-on:input="uppercase" v-model.lazy="info.householdNum"><br>
     </div>
 
-    <button type="button" v-on:click="postData">Submit</button>
+    <button type="button" v-on:click="postData">Search</button>
     <div id="submitLabel">
       <p v-if="noRecords">No records found.</p>
       <p v-if="failure">Unable to search records, please try again later.</p>
     </div>
   </form>
 
+  <h2>Results</h2>
   <table>
     <tr>
       <th>Last Name</th>
@@ -43,6 +45,7 @@
       <th>Date of Birth</th>
       <th>Sex</th>
       <th>Household No.</th>
+      <th>View/Edit</th>
     </tr>
     <tr v-for="record in records">
       <td>[[ record.lastName ]]</td>
@@ -51,6 +54,7 @@
       <td>[[ record.dob ]]</td>
       <td>[[ record.sex ]]</td>
       <td>[[ record.householdNum ]]</td>
+      <td><a v-bind:href="record.link">Link</a></td>
     </tr>
   </table>
   <p v-if="isLoading">Searching...</p>
