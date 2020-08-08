@@ -2,39 +2,41 @@ const app = new Vue({
   data: {
     failureSeen: false,
     info: {
-      barangay: "BOLOBOLO",
-      citizenship: "",
-      city: "EL SALVADOR CITY",
-      dob: "",
-      extName: "",
-      firstName: "",
-      houseHeadRelation: "",
-      householdNum: "",
-      lastName: "",
-      maritalStatus: "",
-      middleName: "",
-      occupation: "",
-      placeOfBirth: "",
-      province: "MISAMIS ORIENTAL",
-      purok: "",
-      region: "X",
-      sex: "",
-      sitio: "",
-      street: "",
+      barangay: 'BOLOBOLO',
+      citizenship: '',
+      city: 'EL SALVADOR CITY',
+      dob: '',
+      extName: '',
+      firstName: '',
+      houseHeadRelation: '',
+      householdNum: '',
+      lastName: '',
+      maritalStatus: '',
+      middleName: '',
+      occupation: '',
+      placeOfBirth: '',
+      province: 'MISAMIS ORIENTAL',
+      purok: '',
+      region: 'X',
+      sex: '',
+      sitio: '',
+      street: '',
     },
     successSeen: false,
     isLoading: false,
   },
-  el: "#app",
+  el: '#app',
   methods: {
-    postData: async function () {
-      const { lastName, firstName, householdNum, dob } = this.info;
+    async postData() {
+      const {
+        lastName, firstName, householdNum, dob,
+      } = this.info;
       if (
-        !lastName ||
-        !firstName ||
-        !householdNum ||
-        !dob ||
-        isNaN(new Date(dob))
+        !lastName
+        || !firstName
+        || !householdNum
+        || !dob
+        || isNaN(new Date(dob))
       ) {
         alert(`Missing one or more of the following information:
 
@@ -47,8 +49,8 @@ Household Number`);
 
       this.isLoading = true;
 
-      const res = await axios.post("/api/addPerson", {
-        _csrf: document.getElementById("_csrf").value,
+      const res = await axios.post('/api/addPerson', {
+        _csrf: document.getElementById('_csrf').value,
         info: this.info,
         token,
       });
@@ -62,22 +64,22 @@ Household Number`);
         this.failureSeen = false;
         this.isLoading = false;
         alert(
-          "Success!".concat(
-            " You have successfully added ",
+          'Success!'.concat(
+            ' You have successfully added ',
             firstName,
-            " to household number: ",
+            ' to household number: ',
             householdNum,
-            "."
-          )
+            '.',
+          ),
         );
       }
     },
 
-    uppercase: function(e) {
+    uppercase(e) {
       e.target.value = e.target.value.toUpperCase();
     },
 
-    addMore: function() {
+    addMore() {
       location.reload();
     },
   },

@@ -16,7 +16,14 @@ const app = new Vue({
       const {
         dob, firstName, householdNum, lastName,
       } = this.info;
-      if (!dob || !firstName || !lastName || (this.checkbox && !householdNum)) {
+      if (!lastName || !firstName || !householdNum || !dob
+        || isNaN(new Date(dob)) || (this.checkbox && !householdNum)) {
+        alert(`Missing one or more of the following information:
+
+Last name
+First name
+Date of birth
+Household Number`);
         return;
       }
 
